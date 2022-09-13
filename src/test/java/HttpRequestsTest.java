@@ -14,6 +14,7 @@ public class HttpRequestsTest {
         //client = new HttpRequests("httpbin.org", 80, "/random");
         //assertEquals(404, client.getStatusCode());
     }
+
     @Test
     void shouldGetFailureResponseCode() throws IOException {
         HttpRequests client = new HttpRequests("httpbin.org", 80, "/status/403");

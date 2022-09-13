@@ -3,6 +3,8 @@ import java.net.Socket;
 
 public class HttpRequests {
 
+    private final int statusCode;
+
     public HttpRequests(String host, int port, String requestTarget) throws IOException {
 
         Socket socket = new Socket(host, port);
@@ -14,16 +16,29 @@ public class HttpRequests {
 
         socket.getOutputStream().write(request.getBytes());
 
+        String statusLine = extracted(socket);
+        statusCode = Integer.parseInt(statusLine.split(" ")[1]);
+
+
+
+
+    }
+
+    private String extracted(Socket socket) throws IOException {
         int c;
-        while ((c = socket.getInputStream().read()) != -1) {
-            //System.out.print((char) c);
+        StringBuilder line = new StringBuilder();
+        while ( (c = socket.getInputStream().read()) != '\r') {
+            line.append( (char) c);
         }
 
+        c = socket.getInputStream().read(); // reads the next \n
+        System.out.println(line);
+        return line.toString();
     }
 
     public int getStatusCode() {
 
-        return 200;
+        return statusCode;
     }
 
 
