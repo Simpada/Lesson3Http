@@ -27,4 +27,10 @@ public class HttpRequestsTest {
         assertEquals("text/html; charset=utf-8", client.getHeader("Content-Type"));
     }
 
+    @Test
+    void findContentLength() throws IOException {
+        HttpRequests client = new HttpRequests("httpbin.org", 80, "/html");
+        assertEquals("3741", client.getHeader("Content-Length"));
+    }
+
 }

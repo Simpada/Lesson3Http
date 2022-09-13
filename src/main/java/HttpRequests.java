@@ -30,6 +30,8 @@ public class HttpRequests {
             headers.put(pieces[0], pieces[1]);
         }
 
+
+
     }
 
     private String readLine(Socket socket) throws IOException {
