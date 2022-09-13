@@ -41,6 +41,11 @@ public class HttpRequests {
         return statusCode;
     }
 
+    public String getHeader(String header) {
+
+        return "";
+    }
+
 
     public static void main(String[] args) throws IOException {
         Socket socket = new Socket("httpbin.org", 80);
@@ -57,5 +62,6 @@ public class HttpRequests {
             System.out.print((char) c);
         }
     }
+
 
 }
