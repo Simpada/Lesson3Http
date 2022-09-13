@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -7,7 +8,7 @@ public class HttpRequests {
 
     private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final int statusCode;
-    private String body;
+    private final String body;
     private final int contentLength;
 
     public HttpRequests(String host, int port, String requestTarget) throws IOException {
@@ -21,7 +22,7 @@ public class HttpRequests {
                 "\r\n")
         ;
 
-        socket.getOutputStream().write(request.getBytes());
+        socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
 
         String statusLine = readLine(socket);
 
@@ -35,12 +36,12 @@ public class HttpRequests {
 
         contentLength = Integer.parseInt(getHeader("Content-Length"));
 
-        StringBuilder body = new StringBuilder();
-        for (int i = 0; i < contentLength; i++) {
-            body.append((char)socket.getInputStream().read());
+        var body = new byte[contentLength];
+        for (int i = 0; i < body.length; i++) {
+            body[i] = (byte) socket.getInputStream().read();
         }
-        this.body = body.toString();
-        System.out.println(body);
+        this.body = new String(body, StandardCharsets.UTF_8);
+        //System.out.println(body);
     }
 
     private String readLine(Socket socket) throws IOException {
@@ -73,19 +74,10 @@ public class HttpRequests {
     }
 
     public static void main(String[] args) throws IOException {
-        Socket socket = new Socket("httpbin.org", 80);
-        String request =
-                ("GET /html HTTP/1.1\r\n" +
-                        "Connection: close\r\n" +
-                        "Host: httpbin.org\r\n" +
-                        "\r\n");
+        var socket = new HttpRequests("httpbin.org", 80, "/html");
 
-        socket.getOutputStream().write(request.getBytes());
+        System.out.println(socket.body);
 
-        int c;
-        while ((c = socket.getInputStream().read()) != -1) {
-            System.out.print((char) c);
-        }
     }
 
 
