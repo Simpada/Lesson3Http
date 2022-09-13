@@ -7,10 +7,12 @@ public class HttpRequests {
 
     private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final int statusCode;
+    private String body;
+    private final int contentLength;
 
     public HttpRequests(String host, int port, String requestTarget) throws IOException {
 
-        var socket = new Socket(host, port);
+        Socket socket = new Socket(host, port);
 
         String request =
                 ("GET " + requestTarget + " HTTP/1.1\r\n" +
@@ -22,6 +24,7 @@ public class HttpRequests {
         socket.getOutputStream().write(request.getBytes());
 
         String statusLine = readLine(socket);
+
         statusCode = Integer.parseInt(statusLine.split(" ")[1]);
 
         String headerLine;
@@ -30,8 +33,14 @@ public class HttpRequests {
             headers.put(pieces[0], pieces[1]);
         }
 
+        contentLength = Integer.parseInt(getHeader("Content-Length"));
 
-
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < contentLength; i++) {
+            body.append((char)socket.getInputStream().read());
+        }
+        this.body = body.toString();
+        System.out.println(body);
     }
 
     private String readLine(Socket socket) throws IOException {
@@ -40,7 +49,6 @@ public class HttpRequests {
         while ( (c = socket.getInputStream().read()) != '\r') {
             line.append( (char) c);
         }
-
         socket.getInputStream().read(); // reads the next \n
         //System.out.println(line);
         return line.toString();
@@ -56,6 +64,13 @@ public class HttpRequests {
         return headers.get(header);
     }
 
+    public String getBody() {
+        return body;
+    }
+
+    public int getContentLength() {
+        return contentLength;
+    }
 
     public static void main(String[] args) throws IOException {
         Socket socket = new Socket("httpbin.org", 80);

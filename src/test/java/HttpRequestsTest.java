@@ -2,6 +2,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpRequestsTest {
 
@@ -31,6 +32,16 @@ public class HttpRequestsTest {
     void findContentLength() throws IOException {
         HttpRequests client = new HttpRequests("httpbin.org", 80, "/html");
         assertEquals("3741", client.getHeader("Content-Length"));
+        assertEquals(3741, client.getContentLength());
     }
+
+    @Test
+    void shouldReadResponseBody() throws IOException {
+        HttpRequests client = new HttpRequests("httpbin.org", 80, "/html");
+        String body = client.getBody();
+        assertTrue(body.startsWith("<!DOCTYPE html>"));
+        assertTrue(body.endsWith("</html>"));
+    }
+
 
 }
