@@ -8,9 +8,10 @@ public class HttpServerTest {
 
     @Test
     void shouldGive404() throws IOException {
-        var server = new HttpServer();
+        var server = new HttpServer(0);
         var client = new HttpRequests("localhost", server.getPort(), "/oogabooga");
         assertEquals(404, client.getStatusCode());
     }
+
 
 }
