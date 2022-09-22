@@ -13,5 +13,12 @@ public class HttpServerTest {
         assertEquals(404, client.getStatusCode());
     }
 
+    @Test
+    void shouldReadResponseCode200() throws IOException {
+        HttpServer server = new HttpServer(0);
+        int port = server.getPort();
+        HttpRequests client = new HttpRequests("localhost", port, "/hello");
+        assertEquals(200, client.getStatusCode());
+    }
 
 }
