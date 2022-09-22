@@ -2,16 +2,17 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class HttpServer {
 
     private ServerSocket serverSocket;
-    //private final Path serverRoot;
+    private final Path serverRoot;
 
-    public HttpServer(int port) throws IOException {
+    public HttpServer(int port, Path serverRoot) throws IOException {
         serverSocket = new ServerSocket(port);
-        //this.serverRoot = serverRoot;
+        this.serverRoot = serverRoot;
         start();
     }
 
@@ -30,22 +31,25 @@ public class HttpServer {
     }
 
     private void handleClient (Socket clientSocket) throws IOException {
+        var request = new HttpMessage(clientSocket);
+        var requestTarget = request.getStartLine().split(" ")[1];
+        //var targetParts = requestTarget.split("")
 
-        var responseBody = "Unknown URL '/oogabooga'";
-        clientSocket.getOutputStream().write(("HTTP/1.1 404 NOT FOUND\r\n" +
-                                              "Content-Type: text/plain\r\n" +
-                                              "Content-Length: " + responseBody.length() + "\r\n" +
-                                              "\r\n" +
-                                              responseBody +
-                                              "\r\n").getBytes(StandardCharsets.UTF_8));
+        var requestPath = serverRoot.resolve(requestTarget.substring(1));
 
+        if (Files.exists(requestPath)) {
+            clientSocket.getOutputStream().write(("HTTP/1.1 200 OK\r\n" +
+                                                  "\r\n").getBytes(StandardCharsets.UTF_8));
+        } else {
+            var responseBody = "Unknown URL '" + requestTarget + "'";
+            clientSocket.getOutputStream().write(("HTTP/1.1 404 NOT FOUND\r\n" +
+                                                   "Content-Type: text/plain\r\n" +
+                                                  "Content-Length: " + responseBody.length() + "\r\n" +
+                                                  "\r\n" +
+                                                  responseBody +
+                                                  "\r\n").getBytes(StandardCharsets.UTF_8));
+        }
     }
-
-    public static int getStatusCode() {
-
-        return 0;
-    }
-
 
     public int getPort() {
         return serverSocket.getLocalPort();

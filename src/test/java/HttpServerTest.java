@@ -13,8 +13,8 @@ public class HttpServerTest {
 
     @Test
     void shouldGive404() throws IOException {
-        var server = new HttpServer(0);
-        var client = new HttpRequests("localhost", server.getPort(), "/oogabooga");
+        var server = new HttpServer(0, serverRoot);
+        var client = new HttpRequestResult("localhost", server.getPort(), "/oogabooga");
         assertEquals(404, client.getStatusCode());
     }
 
@@ -24,8 +24,8 @@ public class HttpServerTest {
         Path file = serverRoot.resolve("hello.txt");
         String content = "Hello " + LocalDateTime.now();
         Files.writeString(file, content);
-        HttpServer server = new HttpServer(0);
-        HttpRequests client = new HttpRequests("localhost", server.getPort(), "/" + file.getFileName());
+        var server = new HttpServer(0, serverRoot);
+        var client = new HttpRequestResult("localhost", server.getPort(), "/" + file.getFileName());
         assertEquals(200, client.getStatusCode());
     }
 
