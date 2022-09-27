@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,8 +9,8 @@ public class HttpRequests {
 
     private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final int statusCode;
-    private final String body;
-    private final int contentLength;
+    private String body;
+    private int contentLength;
 
     public HttpRequests(String host, int port, String requestTarget) throws IOException {
 
@@ -34,14 +35,20 @@ public class HttpRequests {
             headers.put(pieces[0], pieces[1]);
         }
 
-        contentLength = Integer.parseInt(getHeader("Content-Length"));
+        if (getHeader("Content-Length") != null) {
+            contentLength = Integer.parseInt(getHeader("Content-Length"));
 
+            body = readBody(socket);
+            //System.out.println(getBody());
+        }
+    }
+
+    private String readBody(Socket socket) throws IOException {
         var body = new byte[contentLength];
         for (int i = 0; i < body.length; i++) {
             body[i] = (byte) socket.getInputStream().read();
         }
-        this.body = new String(body, StandardCharsets.UTF_8);
-        //System.out.println(body);
+        return new String(body, StandardCharsets.UTF_8);
     }
 
     private String readLine(Socket socket) throws IOException {

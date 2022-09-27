@@ -1,3 +1,5 @@
+import Johannes.HttpMessage;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,16 +9,15 @@ import java.nio.file.Path;
 
 public class HttpServer {
 
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
     private final Path serverRoot;
 
     public HttpServer(int port, Path serverRoot) throws IOException {
         serverSocket = new ServerSocket(port);
         this.serverRoot = serverRoot;
-        start();
     }
 
-    private void start() {
+    void start() {
 
         new Thread(() -> {
             try {
@@ -25,7 +26,6 @@ public class HttpServer {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }).start();
 
     }
@@ -33,7 +33,6 @@ public class HttpServer {
     private void handleClient (Socket clientSocket) throws IOException {
         var request = new HttpMessage(clientSocket);
         var requestTarget = request.getStartLine().split(" ")[1];
-        //var targetParts = requestTarget.split("")
 
         var requestPath = serverRoot.resolve(requestTarget.substring(1));
 
@@ -61,14 +60,13 @@ public class HttpServer {
 
         var clientSocket = serverSocket.accept();
 
-        var body = "<html><h1>Hello Bitchachos øæå</h1></html>";
+        var body = "<html><h1>Hello Bitchæchos</h1></html>";
         var contentLength = body.getBytes().length;
 
         clientSocket.getOutputStream().write(("HTTP/1.1 200 OK\r\n" +
-                                              "Content-Type: text/html\r\n" +
+                                              "Content-Type: text/html; charset=utf-8\r\n" +
                                               "Content-Length: " + contentLength + "\r\n" +
                                               "\r\n" +
                                               body).getBytes(StandardCharsets.UTF_8));
-
     }
 }
