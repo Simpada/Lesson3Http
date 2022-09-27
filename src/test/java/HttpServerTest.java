@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +47,17 @@ public class HttpServerTest {
         var client = new HttpRequests("localhost", port, "/no-file-here");
 
         assertEquals("Unknown URL '/no-file-here'", client.getBody());
+    }
+
+    @Test
+    void shouldReadFileFromDisk() throws IOException {
+        HttpServer server = new HttpServer(0, serverRoot);
+        server.start();
+        int port = server.getPort();
+        String fileContent = "A file created at " + LocalDateTime.now();
+        Files.write(Paths.get("target/test-files/example-file.txt"), fileContent.getBytes());
+        var client = new HttpRequests("localhost", port, "/example-file.txt");
+        assertEquals(fileContent, client.getBody());
     }
 
 
