@@ -28,7 +28,6 @@ public class HttpServer {
                 e.printStackTrace();
             }
         }).start();
-
     }
 
     private void handleClient (Socket clientSocket) throws IOException {
@@ -41,14 +40,15 @@ public class HttpServer {
             clientSocket.getOutputStream().write(("HTTP/1.1 200 OK\r\n" +
                                                   "Connection: close\r\n" +
                                                   "Content-Length: " + requestPath.toFile().length() + "\r\n" +
-                                                  "\r\n").getBytes(StandardCharsets.UTF_8));
+                                                  "\r\n"
+            ).getBytes(StandardCharsets.UTF_8));
             try (var fileInputStream = new FileInputStream(requestPath.toFile())) {
                 fileInputStream.transferTo(clientSocket.getOutputStream());
             }
         } else {
             var responseBody = "Unknown URL '" + requestTarget + "'";
             clientSocket.getOutputStream().write(("HTTP/1.1 404 NOT FOUND\r\n" +
-                                                   "Content-Type: text/plain\r\n" +
+                                                  "Content-Type: text/plain\r\n" +
                                                   "Content-Length: " + responseBody.length() + "\r\n" +
                                                   "\r\n" +
                                                   responseBody +
